@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول المتدرب - العرض الأفقي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #2ecc71, #3498db);
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .search-section {
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+            align-items: flex-end;
+        }
+        
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        
+        .input-group {
+            flex: 1;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .student-info {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            display: none;
+        }
+        
+        .student-info.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .schedule-section {
+            padding: 20px;
+            display: none;
+            overflow-x: auto;
+        }
+        
+        .schedule-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .schedule-container {
+            min-width: 800px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .horizontal-schedule {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .horizontal-schedule th {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid #34495e;
+        }
+        
+        .horizontal-schedule td {
+            padding: 12px 10px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+            vertical-align: top;
+            min-width: 150px;
+        }
+        
+        .day-header {
+            background: #3498db !important;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .time-slot {
+            background: #ecf0f1;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .course-cell {
+            background: #e8f5e8;
+            border-radius: 6px;
+            margin: 2px;
+        }
+        
+        .course-info {
+            padding: 8px;
+        }
+        
+        .course-code {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .course-name {
+            color: #27ae60;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        
+        .course-room {
+            color: #e74c3c;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .empty-cell {
+            background: #f8f9fa;
+            color: #bdc3c7;
+            font-style: italic;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            display: none;
+        }
+        
+        .no-results.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .no-results i {
+            font-size: 64px;
+            color: #bdc3c7;
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px 20px;
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .schedule-section {
+                padding: 10px;
+            }
+            
+            .horizontal-schedule th,
+            .horizontal-schedule td {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+            
+            .course-info {
+                padding: 4px;
+            }
+            
+            .course-code {
+                font-size: 12px;
+            }
+            
+            .course-name {
+                font-size: 10px;
+            }
+            
+            .course-room {
+                font-size: 9px;
+            }
+        }
+        
+        .print-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            margin-left: 10px;
+        }
+        
+        .print-btn:hover {
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calendar-alt"></i> جدول المتدربين</h1>
+            <p class="subtitle">عرض الجدول الدراسي بشكل أفقي - البحث برقم المتدرب</p>
+        </header>
+        
+        <section class="search-section">
+            <div class="search-container">
+                <div class="input-group">
+                    <label for="studentId"><i class="fas fa-id-card"></i> الرقم التدريبي:</label>
+                    <input type="text" id="studentId" placeholder="أدخل الرقم التدريبي">
+                </div>
+                <button id="searchBtn">
+                    <i class="fas fa-search"></i> عرض الجدول
+                </button>
+                <button id="printBtn" class="print-btn">
+                    <i class="fas fa-print"></i> طباعة
+                </button>
+            </div>
+        </section>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>جاري تحميل الجدول...</p>
+        </div>
+        
+        <section class="student-info" id="studentInfo">
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-label">اسم المتدرب:</div>
+                    <div class="info-value" id="studentName">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">البرنامج:</div>
+                    <div class="info-value" id="studentProgram">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">الفصل التدريبي:</div>
+                    <div class="info-value" id="trainingSemester">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">المرشد الأكاديمي:</div>
+                    <div class="info-value" id="advisorName">-</div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="schedule-section" id="scheduleSection">
+            <div class="schedule-container">
+                <table class="horizontal-schedule" id="scheduleTable">
+                    <!-- سيتم إنشاء الجدول ديناميكياً -->
+                </table>
+            </div>
+        </section>
+        
+        <div class="no-results" id="noResults">
+            <i class="fas fa-search"></i>
+            <h3>لم يتم العثور على نتائج</h3>
+            <p>يرجى التأكد من صحة الرقم التدريبي والمحاولة مرة أخرى</p>
+        </div>
+        
+        <footer>
+            <p>جميع الحقوق محفوظة &copy; 2024 - نظام الجداول الدراسية</p>
+        </footer>
+    </div>
+
+    <script>
+        // البيانات سيتم تحميلها من ملف JSON
+        let jsonData = [];
+
+        // عناصر DOM
+        const studentIdInput = document.getElementById('studentId');
+        const searchBtn = document.getElementById('searchBtn');
+        const printBtn = document.getElementById('printBtn');
+        const loadingEl = document.getElementById('loading');
+        const studentInfoEl = document.getElementById('studentInfo');
+        const scheduleSectionEl = document.getElementById('scheduleSection');
+        const noResultsEl = document.getElementById('noResults');
+        const scheduleTable = document.getElementById('scheduleTable');
+
+        // أحداث
+        searchBtn.addEventListener('click', searchStudent);
+        printBtn.addEventListener('click', printSchedule);
+        studentIdInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchStudent();
+        });
+
+        // دالة البحث
+        function searchStudent() {
+            const studentId = studentIdInput.value.trim();
+            
+            if (!studentId) {
+                alert('يرجى إدخال الرقم التدريبي');
+                return;
+            }
+            
+            showLoading();
+            hideAllSections();
+            
+            setTimeout(() => {
+                const studentData = jsonData.filter(item => item.الرقمالتدريبي == studentId);
+                
+                if (studentData.length === 0) {
+                    showNoResults();
+                } else {
+                    displayStudentInfo(studentData[0]);
+                    displayHorizontalSchedule(studentData);
+                }
+                
+                hideLoading();
+            }, 800);
+        }
+        
+        // دالة عرض معلومات الطالب
+        function displayStudentInfo(student) {
+            document.getElementById('studentName').textContent = student.اسمالمتدرب;
+            document.getElementById('studentProgram').textContent = student.البرنامج;
+            document.getElementById('trainingSemester').textContent = student.الفصلالتدريبي;
+            document.getElementById('advisorName').textContent = student.اسمالمرشد || 'غير محدد';
+            studentInfoEl.classList.add('show');
+        }
+        
+        // دالة لعرض الجدول الأفقي
+        function displayHorizontalSchedule(studentData) {
+            // استخراج جميع الأوقات الفريدة
+            const uniqueTimes = [...new Set(studentData.map(item => item.الوقت))].sort();
+            
+            // استخراج جميع الأيام الفريدة
+            const daysOrder = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+            const uniqueDays = daysOrder.filter(day => 
+                studentData.some(item => item.اليوم.trim() === day)
+            );
+            
+            // إنشاء هيكل الجدول
+            let tableHTML = '<thead><tr><th>الوقت / اليوم</th>';
+            
+            // عناوين الأيام
+            uniqueDays.forEach(day => {
+                tableHTML += `<th class="day-header">${day}</th>`;
+            });
+            
+            tableHTML += '</tr></thead><tbody>';
+            
+            // صفوف الجدول (كل صف يمثل وقت)
+            uniqueTimes.forEach(time => {
+                tableHTML += `<tr><td class="time-slot">${time}</td>`;
+                
+                // خلايا الجدول لكل يوم
+                uniqueDays.forEach(day => {
+                    const courses = studentData.filter(item => 
+                        item.اليوم.trim() === day && item.الوقت === time
+                    );
+                    
+                    if (courses.length > 0) {
+                        const course = courses[0];
+                        tableHTML += `
+                            <td class="course-cell">
+                                <div class="course-info">
+                                    <div class="course-code">${course.المقرر}</div>
+                                    <div class="course-name">${course.عنوانالمقرر}</div>
+                                    <div class="course-room">${course.الغرفة}</div>
+                                </div>
+                            </td>
+                        `;
+                    } else {
+                        tableHTML += `<td class="empty-cell">-</td>`;
+                    }
+                });
+                
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody>';
+            scheduleTable.innerHTML = tableHTML;
+            scheduleSectionEl.classList.add('show');
+        }
+        
+        // دالة الطباعة
+        function printSchedule() {
+            if (!scheduleSectionEl.classList.contains('show')) {
+                alert('يرجى عرض الجدول أولاً قبل الطباعة');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html dir="rtl">
+                <head>
+                    <title>جدول المتدرب - ${document.getElementById('studentName').textContent}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+                        th { background: #f0f0f0; }
+                        .day-header { background: #d0e0f0; }
+                        .time-slot { background: #e0e0e0; font-weight: bold; }
+                        .course-cell { background: #e8f5e8; }
+                        .course-code { font-weight: bold; }
+                        .course-room { color: #c00; font-size: 12px; }
+                        @media print {
+                            body { margin: 0; }
+                            table { font-size: 12px; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h2>جدول المتدرب: ${document.getElementById('studentName').textContent}</h2>
+                    <p><strong>الرقم التدريبي:</strong> ${studentIdInput.value}</p>
+                    ${scheduleTable.outerHTML}
+                    <script>window.print();<\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        
+        // دوال مساعدة
+        function showLoading() {
+            loadingEl.classList.add('show');
+        }
+        
+        function hideLoading() {
+            loadingEl.classList.remove('show');
+        }
+        
+        function showNoResults() {
+            noResultsEl.classList.add('show');
+        }
+        
+        function hideAllSections() {
+            studentInfoEl.classList.remove('show');
+            scheduleSectionEl.classList.remove('show');
+            noResultsEl.classList.remove('show');
+        }
+
+        // تحميل البيانات من ملف JSON
+        // في الموقع الحقيقي، استخدم:
+      fetch('tabel.json').then(response => response.json()).then(data => { jsonData = data; });
+        
+        
+    </script>
+</body>
+</html>
